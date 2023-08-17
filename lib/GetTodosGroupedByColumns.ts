@@ -1,5 +1,5 @@
 import { databases } from "@/appwrite";
-import { Column, TypedColumn } from "@/types/types";
+import { Board, Column, TypedColumn } from "@/types/types";
 
 export const getTodosGroupedByColumns = async () => {
   try {
@@ -22,7 +22,30 @@ export const getTodosGroupedByColumns = async () => {
       });
       return acc;
     }, new Map<TypedColumn, Column>());
-    console.log(columns);
+
+    // ensure that the values always excist 
+
+    const columnTypes: TypedColumn[] = ["todo", "inprogress", "done"];
+    for (const columnType of columnTypes) {
+      if (!columns.get(columnType)) {
+        columns.set(columnType, {
+          id: columnType,
+          todos: [],
+        });
+      }
+    }
+
+    // ensure to sort the Map in the order "todo", "inprogress", "done"
+    const sortedColumns = new Map(
+      Array.from(columns.entries()).sort(
+        (a, b) => columnTypes.indexOf(a[0]) - columnTypes.indexOf(b[0])
+      )
+    );
+
+    const board: Board = {
+      columns: sortedColumns,
+    };
+    return board;
   } catch (error) {
     console.log(error);
   }
