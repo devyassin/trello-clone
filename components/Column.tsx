@@ -18,7 +18,6 @@ const idToColumnText: {
   done: "Done",
 };
 const Column = ({ id, todos, index }: Props) => {
-  console.log(idToColumnText);
   return (
     <Draggable draggableId={id} index={index}>
       {(provided) => {
