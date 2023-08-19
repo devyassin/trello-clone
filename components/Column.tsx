@@ -1,3 +1,4 @@
+import { useBoardStore } from "@/store/BoardStore";
 import { Todo, TypedColumn } from "@/types/types";
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 import React from "react";
@@ -18,6 +19,7 @@ const idToColumnText: {
   done: "Done",
 };
 const Column = ({ id, todos, index }: Props) => {
+  const searchString = useBoardStore((state) => state.searchString);
   return (
     <Draggable draggableId={id} index={index}>
       {(provided) => {
@@ -40,11 +42,24 @@ const Column = ({ id, todos, index }: Props) => {
                     <h2 className="flex justify-between font-bold text-xl p-2">
                       {idToColumnText[id]}
                       <span className="text-gray-500 bg-gray-200 rounded-full px-2 py-1 text-sm font-normal">
-                        {todos.length}
+                        {searchString
+                          ? todos.filter((todo) =>
+                              todo.title
+                                .toLowerCase()
+                                .includes(searchString.toLowerCase())
+                            ).length
+                          : todos.length}
                       </span>
                     </h2>
                     <div className="space-y-2">
                       {todos.map((todo, index) => {
+                        if (
+                          searchString &&
+                          !todo.title
+                            .toLocaleLowerCase()
+                            .includes(searchString.toLocaleLowerCase())
+                        )
+                          return null;
                         return (
                           <Draggable
                             key={todo.$id}
